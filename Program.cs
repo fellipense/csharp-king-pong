@@ -2,11 +2,17 @@
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
+using System.IO;
+using System.Media;
+using King_Pong;
 
 namespace King_Pong
 {
     class Program : GameWindow
     {
+        // Set game speed here
+        int Speed = 10;
+
         // Set "x, y" positions and speed of the ball and playes
         int xBallPos = 0;
         int yBallPos = 0;
@@ -17,26 +23,31 @@ namespace King_Pong
 
         int yPlayer1Pos = 0;
         int yPlayer2Pos = 0;
+
+        // Set score
+        int Player1Score = 0;
+        int Player2Score = 0;
+
+        int HitCounter = 0;
  
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            // Set value positive or negative randomlly
-            int NegOrPos(int val)
-            {
-                int[] a = { 1, -1 };
-                return val * a[new Random().Next(0, 2)];
-            }
+            SoundPlayer BallHit = new SoundPlayer(functions.SoundLocal("BallHit.wav"));
+            SoundPlayer GameLose = new SoundPlayer(functions.SoundLocal("Lose.wav"));
+            SoundPlayer GameWin = new SoundPlayer(functions.SoundLocal("Win.wav"));
+
+            if (Player1Score > 9 || Player2Score > 9) Exit();
 
             // Set the direction that the ball will start going with 5px of speed
             if (xBallSpeed == 0)
             {
-                xBallSpeed = NegOrPos(5);
+                xBallSpeed = functions.NegOrPos(Speed);
             }
 
             // Randomize the "y" direction at start
             if (yBallSpeed == 0)
             {
-                yBallSpeed = NegOrPos(new Random().Next(-10, 10));
+                yBallSpeed = functions.NegOrPos(Speed);
             }
 
             // Make objects move
@@ -44,17 +55,36 @@ namespace King_Pong
             yBallPos += yBallSpeed;
 
             // Restarts the game with someone loses
-            if ((xBallPos - BallSize > ClientSize.Width / 2) || (xBallPos + BallSize < -ClientSize.Width / 2))
+            if (xBallPos - BallSize > ClientSize.Width / 2)
             {
-                xBallPos = 0;
-                yBallPos = 0;
-                BallSize = 10;
+                // cmd logger
+                Console.WriteLine("-------------------");
+                Console.WriteLine($"Hit counter:......{HitCounter}");
+                Console.WriteLine($"BallSpeed:........{xBallSpeed}px");
+                Console.WriteLine($"Player1 score:....{Player1Score}");
+                Console.WriteLine($"Player2 score:....{Player2Score}");
 
-                xBallSpeed = 0;
-                yBallSpeed = 0;
+                xBallPos = 0; yBallPos = 0; BallSize = 10; xBallSpeed = 0;
+                yBallSpeed = 0; yPlayer1Pos = 0; yPlayer2Pos = 0; HitCounter = 0;
 
-                yPlayer1Pos = 0;
-                yPlayer2Pos = 0;
+                GameLose.PlaySync();
+                Player2Score++;
+            }
+
+            if (xBallPos + BallSize < -ClientSize.Width / 2)
+            {
+                // cmd logger
+                Console.WriteLine("-------------------");
+                Console.WriteLine($"Hit counter:......{HitCounter}");
+                Console.WriteLine($"BallSpeed:........{-xBallSpeed}px");
+                Console.WriteLine($"Player1 score:....{Player1Score}");
+                Console.WriteLine($"Player2 score:....{Player2Score}");
+
+                xBallPos = 0; yBallPos = 0; BallSize = 10; xBallSpeed = 0;
+                yBallSpeed = 0; yPlayer1Pos = 0; yPlayer2Pos = 0; HitCounter = 0;
+
+                GameWin.PlaySync();
+                Player1Score++;
             }
 
             // If ball touch top or bottom it will go to opposite "y" direction
@@ -66,37 +96,29 @@ namespace King_Pong
             // Controls of Player 1 (you)
             if (Keyboard.GetState().IsKeyDown(Key.Up) && !(yPlayer1Pos + 30 > ClientSize.Height / 2))
             {
-                yPlayer1Pos += 8;
+                yPlayer1Pos += Speed;
             }
 
             if (Keyboard.GetState().IsKeyDown(Key.Down) && !(yPlayer1Pos - 30 < -ClientSize.Height / 2))
             {
-                yPlayer1Pos -= 8;
+                yPlayer1Pos -= Speed;
             }
 
             // Ball colision system
-            if ((yBallPos + BallSize / 2 < yPlayer1Pos + 30) && (yBallPos - BallSize / 2 > yPlayer1Pos - 30) && (xBallPos + BallSize / 2 >= ClientSize.Width / 2 - 5))
+            if ((yBallPos - BallSize / 2 < yPlayer1Pos + 30) && (yBallPos + BallSize / 2 > yPlayer1Pos - 30) && (xBallPos + BallSize / 2 >= ClientSize.Width / 2 - 5))
             {
                 if (xBallSpeed > 0) xBallSpeed = -(xBallSpeed + 1);
                 else if (xBallSpeed < 0) xBallSpeed = -(xBallSpeed - 1);
-                yBallSpeed = NegOrPos(new Random().Next(-10, 10));
-                // cmd "logger" system
-                Console.WriteLine("-------------------");
-                Console.WriteLine("Right");
-                Console.WriteLine($"xBallSpeed: {xBallSpeed}");
-                Console.WriteLine($"yBallSpeed: {yBallSpeed}");
+                BallHit.Play();
+                HitCounter++;
             }
 
-            if ((yBallPos + BallSize / 2 < yPlayer2Pos + 30) && (yBallPos - BallSize / 2 > yPlayer2Pos - 30) && (xBallPos - BallSize / 2 <= -ClientSize.Width / 2 + 5))
+            if ((yBallPos - BallSize / 2 < yPlayer2Pos + 30) && (yBallPos + BallSize / 2 > yPlayer2Pos - 30) && (xBallPos - BallSize / 2 <= -ClientSize.Width / 2 + 5))
             {
                 if (xBallSpeed > 0) xBallSpeed = -(xBallSpeed + 1);
                 else if (xBallSpeed < 0) xBallSpeed = -(xBallSpeed - 1);
-                yBallSpeed = NegOrPos(new Random().Next(-10, 10));
-                // cmd "logger" system
-                Console.WriteLine("-------------------");
-                Console.WriteLine("Left");
-                Console.WriteLine($"xBallSpeed: {xBallSpeed}");
-                Console.WriteLine($"yBallSpeed: {yBallSpeed}");
+                BallHit.Play();
+                HitCounter++;
             }
 
             // Speed limit
@@ -104,16 +126,15 @@ namespace King_Pong
             if (xBallSpeed < -15) xBallSpeed = -15;
 
             // Player 2 IA
-            if (yBallPos > yPlayer2Pos + 10)
+            if (yBallPos > yPlayer2Pos + 5)
             {
-                yPlayer2Pos += 8;
+                yPlayer2Pos += Speed;
             } 
 
-            else if (yBallPos < yPlayer2Pos - 10)
+            else if (yBallPos < yPlayer2Pos - 5)
             {
-                yPlayer2Pos -= 8;
+                yPlayer2Pos -= Speed;
             }
-
         }
 
         // Objects been placed on screen (I don´t know as weel what's happening)
@@ -128,32 +149,39 @@ namespace King_Pong
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
+            functions.RightScoreBoard(Player1Score);
+            functions.LeftScoreBoard(Player2Score);
+
+            // Middle line
+            functions.SetRetangle(0, ClientSize.Height / 2 - 30, 5, 30);
+            functions.SetRetangle(0, ClientSize.Height / 2 - 75, 5, 30);
+            functions.SetRetangle(0, ClientSize.Height / 2 - 120, 5, 30);
+            functions.SetRetangle(0, ClientSize.Height / 2 - 165, 5, 30);
+            functions.SetRetangle(0, ClientSize.Height / 2 - 210, 5, 30);
+            functions.SetRetangle(0, ClientSize.Height / 2 - 255 - 15, 5, 30);
+            functions.SetRetangle(0, ClientSize.Height / 2 - 300 - 15, 5, 30);
+            functions.SetRetangle(0, ClientSize.Height / 2 - 345 - 15, 5, 30);
+            functions.SetRetangle(0, ClientSize.Height / 2 - 390 - 15, 5, 30);
+            functions.SetRetangle(0, ClientSize.Height / 2 - 435 - 15, 5, 30);
+
             // Ball
-            SetRetangle(xBallPos, yBallPos, 10, 10);
+            functions.SetRetangle(xBallPos, yBallPos, 10, 10, 1.0f, 1.0f, 0.0f);
 
             // Player 1
-            SetRetangle(ClientSize.Width / 2 - 5, yPlayer1Pos, 10, 60);
+            functions.SetRetangle(ClientSize.Width / 2 - 5, yPlayer1Pos, 10, 60, 1.0f, 0.0f, 0.0f);
 
             // Player 2
-            SetRetangle(-ClientSize.Width / 2 + 5, yPlayer2Pos, 10, 60);
+            functions.SetRetangle(-ClientSize.Width / 2 + 5, yPlayer2Pos, 10, 60, 1.0f, 0.0f, 0.0f);
 
             SwapBuffers();
-        }
-
-        // Function to easely make a square/retangle
-        void SetRetangle(int x, int y, int w, int h)
-        {
-            GL.Begin(PrimitiveType.Quads);
-            GL.Vertex2(-0.5f * w + x, -0.5f * h + y);
-            GL.Vertex2(0.5f * w + x, -0.5f * h + y);
-            GL.Vertex2(0.5f * w + x, 0.5f * h + y);
-            GL.Vertex2(-0.5f * w + x, 0.5f * h + y);
-            GL.End();
         }
 
         static void Main(string[] args)
         {
             new Program().Run();
+            
+            Console.WriteLine("Game Over");
+            Console.ReadLine();
         }
     }
 }
