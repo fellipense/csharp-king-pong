@@ -58,11 +58,11 @@ namespace King_Pong
             if (xBallPos - BallSize > ClientSize.Width / 2)
             {
                 // cmd logger
-                Console.WriteLine("-------------------");
                 Console.WriteLine($"Hit counter:......{HitCounter}");
                 Console.WriteLine($"BallSpeed:........{xBallSpeed}px");
                 Console.WriteLine($"Player1 score:....{Player1Score}");
                 Console.WriteLine($"Player2 score:....{Player2Score}");
+                Console.WriteLine("-------------------");
 
                 xBallPos = 0; yBallPos = 0; BallSize = 10; xBallSpeed = 0;
                 yBallSpeed = 0; yPlayer1Pos = 0; yPlayer2Pos = 0; HitCounter = 0;
@@ -74,11 +74,11 @@ namespace King_Pong
             if (xBallPos + BallSize < -ClientSize.Width / 2)
             {
                 // cmd logger
-                Console.WriteLine("-------------------");
                 Console.WriteLine($"Hit counter:......{HitCounter}");
                 Console.WriteLine($"BallSpeed:........{-xBallSpeed}px");
                 Console.WriteLine($"Player1 score:....{Player1Score}");
                 Console.WriteLine($"Player2 score:....{Player2Score}");
+                Console.WriteLine("-------------------");
 
                 xBallPos = 0; yBallPos = 0; BallSize = 10; xBallSpeed = 0;
                 yBallSpeed = 0; yPlayer1Pos = 0; yPlayer2Pos = 0; HitCounter = 0;
@@ -158,11 +158,11 @@ namespace King_Pong
             functions.SetRetangle(0, ClientSize.Height / 2 - 120, 5, 30);
             functions.SetRetangle(0, ClientSize.Height / 2 - 165, 5, 30);
             functions.SetRetangle(0, ClientSize.Height / 2 - 210, 5, 30);
-            functions.SetRetangle(0, ClientSize.Height / 2 - 255 - 15, 5, 30);
-            functions.SetRetangle(0, ClientSize.Height / 2 - 300 - 15, 5, 30);
-            functions.SetRetangle(0, ClientSize.Height / 2 - 345 - 15, 5, 30);
-            functions.SetRetangle(0, ClientSize.Height / 2 - 390 - 15, 5, 30);
-            functions.SetRetangle(0, ClientSize.Height / 2 - 435 - 15, 5, 30);
+            functions.SetRetangle(0, -ClientSize.Height / 2 + 30 - 15, 5, 30);
+            functions.SetRetangle(0, -ClientSize.Height / 2 + 75 - 15, 5, 30);
+            functions.SetRetangle(0, -ClientSize.Height / 2 + 120 - 15, 5, 30);
+            functions.SetRetangle(0, -ClientSize.Height / 2 + 165 - 15, 5, 30);
+            functions.SetRetangle(0, -ClientSize.Height / 2 + 210 - 15, 5, 30);
 
             // Ball
             functions.SetRetangle(xBallPos, yBallPos, 10, 10, 1.0f, 1.0f, 0.0f);
