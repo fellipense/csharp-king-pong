@@ -10,8 +10,10 @@ namespace King_Pong
 {
     class Program : GameWindow
     {
+        bool InGame = false;
+
         // Set game speed here
-        int Speed = 10;
+        int Speed = 6;
 
         // Set "x, y" positions and speed of the ball and playes
         int xBallPos = 0;
@@ -36,8 +38,12 @@ namespace King_Pong
             SoundPlayer GameLose = new SoundPlayer(functions.SoundLocal("Lose.wav"));
             SoundPlayer GameWin = new SoundPlayer(functions.SoundLocal("Win.wav"));
 
+            Random ale = new Random();
+
             if (Player1Score > 9 || Player2Score > 9) Exit();
 
+            if (yBallPos == 0 || InGame == false) yBallPos = ale.Next(-ClientSize.Height / 2, ClientSize.Height / 2); InGame = true ;
+            
             // Set the direction that the ball will start going with 5px of speed
             if (xBallSpeed == 0)
             {
@@ -58,8 +64,9 @@ namespace King_Pong
             if (xBallPos - BallSize > ClientSize.Width / 2)
             {
                 // cmd logger
+                GameLose.Play();
                 Console.WriteLine($"Hit counter:......{HitCounter}");
-                Console.WriteLine($"BallSpeed:........{xBallSpeed}px");
+                Console.WriteLine($"BallSpeed:........{functions.Absolute(xBallSpeed)}px");
                 Console.WriteLine($"Player1 score:....{Player1Score}");
                 Console.WriteLine($"Player2 score:....{Player2Score}");
                 Console.WriteLine("-------------------");
@@ -67,13 +74,15 @@ namespace King_Pong
                 xBallPos = 0; yBallPos = 0; BallSize = 10; xBallSpeed = 0;
                 yBallSpeed = 0; yPlayer1Pos = 0; yPlayer2Pos = 0; HitCounter = 0;
 
-                GameLose.PlaySync();
+                InGame = false;
+                
                 Player2Score++;
             }
 
             if (xBallPos + BallSize < -ClientSize.Width / 2)
             {
                 // cmd logger
+                GameWin.Play();
                 Console.WriteLine($"Hit counter:......{HitCounter}");
                 Console.WriteLine($"BallSpeed:........{-xBallSpeed}px");
                 Console.WriteLine($"Player1 score:....{Player1Score}");
@@ -83,7 +92,8 @@ namespace King_Pong
                 xBallPos = 0; yBallPos = 0; BallSize = 10; xBallSpeed = 0;
                 yBallSpeed = 0; yPlayer1Pos = 0; yPlayer2Pos = 0; HitCounter = 0;
 
-                GameWin.PlaySync();
+                InGame = true;
+                
                 Player1Score++;
             }
 
@@ -107,17 +117,17 @@ namespace King_Pong
             // Ball colision system
             if ((yBallPos - BallSize / 2 < yPlayer1Pos + 30) && (yBallPos + BallSize / 2 > yPlayer1Pos - 30) && (xBallPos + BallSize / 2 >= ClientSize.Width / 2 - 5))
             {
-                if (xBallSpeed > 0) xBallSpeed = -(xBallSpeed + 1);
-                else if (xBallSpeed < 0) xBallSpeed = -(xBallSpeed - 1);
                 BallHit.Play();
+                xBallSpeed = -ale.Next(Speed, Speed + 10);
+                
                 HitCounter++;
             }
 
             if ((yBallPos - BallSize / 2 < yPlayer2Pos + 30) && (yBallPos + BallSize / 2 > yPlayer2Pos - 30) && (xBallPos - BallSize / 2 <= -ClientSize.Width / 2 + 5))
             {
-                if (xBallSpeed > 0) xBallSpeed = -(xBallSpeed + 1);
-                else if (xBallSpeed < 0) xBallSpeed = -(xBallSpeed - 1);
                 BallHit.Play();
+                xBallSpeed = ale.Next(Speed, Speed + 10);
+
                 HitCounter++;
             }
 
@@ -148,6 +158,8 @@ namespace King_Pong
             GL.LoadMatrix(ref projection);
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            Console.SetWindowSize(40, 40);
 
             functions.RightScoreBoard(Player1Score);
             functions.LeftScoreBoard(Player2Score);
