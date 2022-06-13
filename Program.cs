@@ -147,7 +147,7 @@ namespace King_Pong
             }
         }
 
-        // Objects been placed on screen (I don´t know as weel what's happening)
+        // Objects been placed on screen (I don´t know as weell what's happening)
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.Viewport(0, 0, ClientSize.Width, ClientSize.Height);
