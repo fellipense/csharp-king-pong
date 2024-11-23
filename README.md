@@ -2,4 +2,7 @@
 
  A very simple Pong game.
 
- I made this game watching a little of the Pong Game tutorial video on "O Programador" Youtube channel
+ I made this game watching Pong Game tutorial video on "O Programador" Youtube channel
+
+- C#
+- OpenTK
